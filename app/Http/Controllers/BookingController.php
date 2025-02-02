@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
-    
+
     public function index()
     {
         $bookings = Booking::with(['movieSchedule.movie', 'seats'])->latest()->get();
@@ -20,10 +20,12 @@ class BookingController extends Controller
     public function create()
     {
         $movies = Movie::where('is_showing', true)->get();
-        $schedules = MovieSchedule::where('is_active', true)->get();
+        // $schedules = MovieSchedule::where('is_active', true)->get();
         $seats = Seat::where('is_available', true)->get();
-        return view('bookings.create', compact('movies', 'seats', 'schedules'));
+        return view('bookings.create', compact('movies', 'seats'));
     }
+
+
 
     public function store(Request $request)
     {
@@ -68,14 +70,17 @@ class BookingController extends Controller
         return view('bookings.show', compact('booking'));
     }
 
-    public function getSchedules($movieId)
+    public function getSchedules($movie)
     {
-        $schedules = MovieSchedule::where('movie_id', $movieId)
+        $schedules = MovieSchedule::where('movie_id', $movie)
             ->where('show_date', '>=', now()->toDateString())
             ->where('is_active', true)
             ->where('available_seats', '>', 0)
             ->get();
 
+        if ($schedules->isEmpty()) {
+            return response()->json(['error' => 'No schedules found'], 404);
+        }
         return response()->json($schedules);
     }
 
@@ -84,5 +89,4 @@ class BookingController extends Controller
         $booking->load(['movieSchedule.movie', 'seats']);
         return view('bookings.ticket', compact('booking'));
     }
-
 }

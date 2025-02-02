@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('seats', function (Blueprint $table) {
             $table->id();
             $table->string('seat_number', 4); // Contoh: A1, B2, dst
+            $table->foreignId('movie_schedule_id')->constrained()->onDelete('cascade');
             $table->boolean('is_available')->default(true);
             $table->timestamps();
         });

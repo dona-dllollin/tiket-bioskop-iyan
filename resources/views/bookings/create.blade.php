@@ -14,15 +14,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="movie_schedule_id" class="form-label">Pilih Jadwal</label>
+                            <label for="movie_schedule_id" class="form-label">Pilih Film</label>
                             <select name="movie_schedule_id" id="movie_schedule_id" 
                                     class="form-select @error('movie_schedule_id') is-invalid @enderror" required>
-                                <option value="">Pilih Jadwal Tayang</option>
-                                @foreach($schedules as $schedule)
-                                    <option value="{{ $schedule->id }}">
-                                        {{ $schedule->movie->title }} - 
-                                        {{ $schedule->show_date->format('d/m/Y') }} 
-                                        {{ $schedule->show_time }}
+                                <option value="">Pilih Film</option>
+                                @foreach($movies as $movie)
+                                    <option value="{{ $movie->id }}">
+                                        {{ $movie->title }}
                                     </option>
                                 @endforeach
                             </select>
@@ -30,6 +28,19 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="schedule_id" class="form-label">Pilih Jadwal Penayangan</label>
+                            <select name="schedule_id" id="schedule_id" 
+                                    class="form-select @error('schedule_id') is-invalid @enderror" required>
+                                <option value="">Pilih Jadwal Penayangan</option>
+                               
+                            </select>
+                            @error('schedule_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
 
                         <div class="mb-3">
                             <label for="customer_name" class="form-label">Nama Pemesan</label>
@@ -79,6 +90,7 @@
 </div>
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#number_of_tickets').on('change', function() {
@@ -95,6 +107,60 @@
                 }
             });
         });
+
+        // $('#movie_schedule_id').change(function ()  {
+        //     let filmId = $(this).val();
+
+        //     if(filmId){
+        //         $.ajax({
+        //             url: `/admin/get-schedules/${filmId}`,
+        //             type: 'GET',
+        //             success : function (data) {
+        //                 $('#schedule_id').empty().append(' <option value="">Pilih Jadwal Penayangan</option>')
+        //                 $.each(data, function (key, value) {
+        //                     $('#schedule_id').append(` <option value="${key}">${value.show_date} - ${value.show_time}</option>`)
+        //                 })
+        //             }
+        //         })
+        //     } else {
+        //         $('#schedule_id').empty().append(' <option value="">Pilih Jadwal Penayangan</option>')
+        //     }
+        // })
+
+        $('#movie_schedule_id').change(function () {
+    let filmId = $(this).val();
+
+    if (filmId) {
+        $.ajax({
+            url: `/admin/get-schedules/${filmId}`,
+            type: 'GET',
+            success: function (data) {
+                $('#schedule_id').empty().append('<option value="">Pilih Jadwal Penayangan</option>');
+
+                $.each(data, function (key, value) {
+                    let showDate = new Date(value.show_date).toLocaleDateString('id-ID', { 
+                        weekday: 'long', 
+                        day: '2-digit', 
+                        month: 'long', 
+                        year: 'numeric' 
+                    });
+                  
+                    // Konversi show_time (datetime) ke jam dan menit
+                    let showTime = new Date(value.show_time).toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: false 
+                    });
+
+                    $('#schedule_id').append(`<option value="${key}">${showDate} - ${showTime}</option>`);
+                });
+            }
+        });
+    } else {
+        $('#schedule_id').empty().append('<option value="">Pilih Jadwal Penayangan</option>');
+    }
+});
+
     });
 </script>
 @endpush

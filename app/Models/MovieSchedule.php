@@ -23,11 +23,16 @@ class MovieSchedule extends Model
         'is_active' => 'boolean'
     ];
 
-    
+
     // Relasi dengan film
     public function movie()
     {
         return $this->belongsTo(Movie::class);
+    }
+
+    public function seats()
+    {
+        return $this->hasMany(Seat::class);
     }
 
     // Relasi dengan booking
@@ -35,5 +40,4 @@ class MovieSchedule extends Model
     {
         return $this->hasMany(Booking::class);
     }
-
 }

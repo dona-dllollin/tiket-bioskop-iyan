@@ -11,6 +11,7 @@ class Seat extends Model
 
     protected $fillable = [
         'seat_number',
+
         'is_available'
     ];
 

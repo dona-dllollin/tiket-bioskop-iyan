@@ -22,13 +22,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     // return redirect('/login');
     return view('welcome');
-
 });
 
 // Route untuk autentikasi
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/get-schedules/{movie}', [BookingController::class, 'getSchedules'])->name('get.schedules');
 });
 
 Route::middleware('auth')->group(function () {
@@ -47,10 +47,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
         Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
         Route::resource('bookings', BookingController::class);
-        Route::get('/get-schedules/{movie}', [BookingController::class, 'getSchedules'])->name('get.schedules');
+
         Route::get('/bookings/{booking}/print', [BookingController::class, 'printTicket'])->name('bookings.print');
     });
 });
-
-
-
